@@ -83,6 +83,14 @@ public class Club {
 		this.liga = liga;
 	}
 
+	public List<Jugador> getJugadores() {
+		return jugadores;
+	}
+
+	public void setJugadores(List<Jugador> jugadores) {
+		this.jugadores = jugadores;
+	}
+
 	@Override
 	public String toString() {
 		return "Club [id=" + id + ", nombre=" + nombre + ", pais=" + pais + ", fundacion=" + fundacion + ", liga="

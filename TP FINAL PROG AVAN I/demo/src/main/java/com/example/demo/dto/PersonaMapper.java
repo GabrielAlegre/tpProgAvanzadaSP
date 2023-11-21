@@ -39,11 +39,12 @@ public class PersonaMapper {
 		dto.setApellido(entity.getApellido());
 		dto.setSexo(entity.getSexo());
 		dto.setDni(entity.getDni());
-		dto.setDomicilios(new ArrayList<DomicilioDTO>());
+		dto.setDomicilios(domicilioMapper.lstEntityToLstDto(entity.getDomicilios()));
 		
+		/*
 		for (Domicilio d : entity.getDomicilios()) {
 			dto.getDomicilios().add(domicilioMapper.entityToDto(d));
-		}
+		}*/
 		
 		return dto;
 	}

@@ -30,9 +30,4 @@ public class DomicilioDTO {
 	public void setAltura(Integer altura) {
 		this.altura = altura;
 	}
-
-
-	
-	
-	
 }
