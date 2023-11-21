@@ -72,7 +72,6 @@ public class ClubController {
 	//Lo ejecuto con el postman
 	@PostMapping("/club")
 	public ResponseEntity<?> crearClub(@RequestBody @Valid Club c) {
-		System.out.println(c.toString());
 		if(c.getJugadores()!=null)
 		{
 			for (Jugador j : c.getJugadores()) {
@@ -86,8 +85,8 @@ public class ClubController {
 	//----------------------------------------- PUT ------------------------------------------
 	@PutMapping("/club")
 	public ResponseEntity<?> modificarClub(@RequestBody @Valid ClubDTO c) {
-		//Para hacer un update previamente verifico que realmente quiera modificar ya que usa el save
-		//xq si nos ejecutan el metodo modificar pero no ponen un id el servidor va hacer un insert
+		//Previamente verifico que realmente quiera modificar, ya que usa el save
+		//si nos ejecutan el metodo modificar pero no ponen un id el servidor va hacer un insert
 		if(c.getId()==null)
 		{
 			return new ResponseEntity<String>("Para modificar un club debe pasar un id", HttpStatus.CONFLICT);

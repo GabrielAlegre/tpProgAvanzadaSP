@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.ClubMapper;
 import com.example.demo.dto.JugadorDTO;
 import com.example.demo.dto.JugadorMapper;
+import com.example.demo.model.Club;
 import com.example.demo.model.Jugador;
 import com.example.demo.repository.ClubRepository;
 import com.example.demo.repository.JugadorRepository;
@@ -63,8 +64,25 @@ public class JugadorController {
 	
 	@PostMapping("/jugador")
 	public ResponseEntity<?> crearJugador(@RequestBody @Validated Jugador j) {
-		jugadorRepository.save(j);
-		return new ResponseEntity<String>("Se el jugador "+ j.getNombre(), HttpStatus.OK);
+		/*Si el club es null (no me pasa ningun id del club cuando hace el post) tomo como que
+		quiere dar de alta un jugador libre que no este asociado a ningun club que no tendria contrato con ningun club*/
+		if(j.getClub()==null)
+		{
+			jugadorRepository.save(j);
+			return new ResponseEntity<String>("Se creo el jugador "+ j.getNombre(), HttpStatus.OK);
+		}
+		else//si el club no es nulo es xq me paso algun id de un club en post y busco si existe un club con ese id
+		{
+			Optional<Club> cOpt = clubRepository.findById(j.getClub().getId());
+			if(cOpt.isPresent())
+			{
+				jugadorRepository.save(j);
+				return new ResponseEntity<String>("Se creo el jugador "+ j.getNombre()+ " Perteneciente al club: "+ cOpt.get().getNombre(), HttpStatus.OK);
+			}
+			else {
+				return new ResponseEntity<String>("No se pudo realizar el alta del jugador xq NO existe un club con el id: "+j.getClub().getId(), HttpStatus.CONFLICT);
+			}	
+		}
 	}
 	
 	@PutMapping("/jugador")
@@ -76,11 +94,18 @@ public class JugadorController {
 		else {
 			Optional<Jugador> cOpt = this.jugadorRepository.findById(j.getId());
 			if(cOpt.isPresent()){
-				this.jugadorRepository.save(j);
-				return new ResponseEntity<String>("Se modifico el jugador", HttpStatus.OK);
+				Optional<Club> clbuOpt = clubRepository.findById(j.getClub().getId());
+				if(clbuOpt.isPresent())
+				{
+					jugadorRepository.save(j);
+					return new ResponseEntity<String>("Se modifico el jugador", HttpStatus.OK);
+				}
+				else {
+					return new ResponseEntity<String>("No se pudo realizar la modificacion xq NO existe un club con el id: "+j.getClub().getId(), HttpStatus.CONFLICT);
+				}	
 			}
 			else {
-				return new ResponseEntity<String>("No se encontro a ningun club con el id: "+j.getId(), HttpStatus.CONFLICT);
+				return new ResponseEntity<String>("No se encontro a ningun jugador con el id: "+j.getId(), HttpStatus.CONFLICT);
 			}
 		}
 	}

@@ -24,21 +24,23 @@ public class ClubService {
 	ClubMapper clubMapper;
 
 	public void modificarClub(ClubDTO c) {
-		//busco los jugadores antiguos antes del put para luego eliminarlos y guardar los nuevos
-		if(c.getJugadores()!=null)
+		/*verifico si quieren modificar los jugadores que esten asociado al club: HAY DOS OPCIONES
+		 * 1: Solo quiera modificar los datos del club, nombre, la liga donde juega, etc
+		 * 2: Quiera modificar los jugadores pertenecientes al club y algun dato propio del club
+		*/
+		if(c.getJugadores()!=null)//opcion 1, que tambien quiera modificar los jugadores del club
 		{
 		    List<Jugador> jugadoresAntiguos = this.jugadorRepository.findJugadoresByClubId(c.getId());
 			for (Jugador j : jugadoresAntiguos) {
-				System.out.println(j);
 				this.jugadorRepository.delete(j);
 			}
-			Club clubModificado = this.clubMapper.dtoToEntity(c);
-			for (Jugador j : clubModificado.getJugadores()) {
-				j.setClub(clubModificado);
+			Club clubModificadoConJugadoresNuevos = this.clubMapper.dtoToEntity(c);
+			for (Jugador j : clubModificadoConJugadoresNuevos.getJugadores()) {
+				j.setClub(clubModificadoConJugadoresNuevos);
 			}
-			this.clubRepository.save(clubModificado);
+			this.clubRepository.save(clubModificadoConJugadoresNuevos);
 		}
-		else
+		else//opcion 2 solo quiera modificar algun dato del club (nombre, la liga donde juega, fundacion) dejando los mismos jugadores
 		{
 			System.out.println("entre");
 		    c.setJugadores(new ArrayList<JugadorDTO>());
