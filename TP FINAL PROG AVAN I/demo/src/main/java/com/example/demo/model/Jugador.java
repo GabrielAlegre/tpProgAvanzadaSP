@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name="sys_jugador")
@@ -17,12 +20,15 @@ public class Jugador {
 	@Column(name = "jug_id")
 	private Long id;
 	
+	@NotBlank (message = "El nombre no puede estar vacio")
 	@Column(name = "jug_nombre")
 	private String nombre;
 	
+	@NotBlank (message = "El apellido no puede estar vacio")
 	@Column(name = "jug_apellido")
 	private String apellido;
 	
+	@NotBlank (message = "La posicion no puede estar vacia")
 	@Column(name = "jug_posicion")
 	private String posicion;
 	
@@ -88,6 +94,17 @@ public class Jugador {
 
 	public void setClub(Club club) {
 		this.club = club;
+	}
+
+
+
+	
+
+
+	@Override
+	public boolean equals(Object obj) {
+		Jugador other = (Jugador) obj;
+		return Objects.equals(this.apellido, other.apellido) && Objects.equals(this.nombre, other.nombre) && Objects.equals(this.posicion, other.posicion);
 	}
 
 

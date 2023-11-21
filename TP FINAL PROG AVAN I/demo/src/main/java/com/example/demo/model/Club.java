@@ -35,12 +35,13 @@ public class Club {
 	@Column(name = "club_fundacion")
 	private Integer fundacion;
 	
+	@NotBlank (message = "La liga no puede estar vacia")
 	@Column(name = "club_liga")
 	private String liga;
 	
 	// de uno a muchos, una club puede tener varios jugadores, el CascadeType.ALL lo que hace es que si doy de alta una persona me inserte el jugador, y si no pongo jugador que no lo ponga
 	//@OneToMany(mappedBy = "p", cascade = CascadeType.ALL)
-	@OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "club", cascade = CascadeType.ALL)
 	private List<Jugador> jugadores;
 
 	public Long getId() {

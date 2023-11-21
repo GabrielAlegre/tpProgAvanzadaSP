@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+
 public class JugadorDTO {
 	
 	private Long id;
@@ -12,6 +13,18 @@ public class JugadorDTO {
 	
 
 	private String posicion;
+	
+	private String equipoDondeJuega;
+
+
+	public String getEquipoDondeJuega() {
+		return equipoDondeJuega;
+	}
+
+
+	public void setEquipoDondeJuega(String equipoDondeJuega) {
+		this.equipoDondeJuega = equipoDondeJuega;
+	}
 
 
 	public Long getId() {
@@ -52,6 +65,14 @@ public class JugadorDTO {
 	public void setPosicion(String posicion) {
 		this.posicion = posicion;
 	}
+
+
 	
-	
+
+	@Override
+	public String toString() {
+		return "JugadorDTO [id=" + id + ", nombre=" + nombre + ", apellido=" + apellido + ", posicion=" + posicion
+				+ "]";
+	}	
+
 }

@@ -17,13 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.ClubDTO;
 import com.example.demo.dto.ClubMapper;
-import com.example.demo.dto.PersonaDTO;
 import com.example.demo.model.Club;
-import com.example.demo.model.Domicilio;
 import com.example.demo.model.Jugador;
-import com.example.demo.model.Persona;
 import com.example.demo.repository.ClubRepository;
 import com.example.demo.repository.JugadorRepository;
+import com.example.demo.service.ClubService;
 
 import jakarta.validation.Valid;
 
@@ -44,6 +42,8 @@ public class ClubController {
 	ClubRepository clubRepository;
 	@Autowired
 	JugadorRepository jugadorRepository;
+	@Autowired
+	ClubService clubService;
 	
 	//----------------------------------------- GETS ------------------------------------------
 	
@@ -73,14 +73,37 @@ public class ClubController {
 	@PostMapping("/club")
 	public ResponseEntity<?> crearClub(@RequestBody @Valid Club c) {
 		System.out.println(c.toString());
-		for (Jugador j : c.getJugadores()) {
-			j.setClub(c);
+		if(c.getJugadores()!=null)
+		{
+			for (Jugador j : c.getJugadores()) {
+				j.setClub(c);
+			}
 		}
 		clubRepository.save(c);
 		return new ResponseEntity<String>("Se creo el club "+ c.getNombre(), HttpStatus.OK);
 	}
 	
 	//----------------------------------------- PUT ------------------------------------------
+	@PutMapping("/club")
+	public ResponseEntity<?> modificarClub(@RequestBody @Valid ClubDTO c) {
+		//Para hacer un update previamente verifico que realmente quiera modificar ya que usa el save
+		//xq si nos ejecutan el metodo modificar pero no ponen un id el servidor va hacer un insert
+		if(c.getId()==null)
+		{
+			return new ResponseEntity<String>("Para modificar un club debe pasar un id", HttpStatus.CONFLICT);
+		}
+		else {
+			Optional<Club> cOpt = this.clubRepository.findById(c.getId());
+			if(cOpt.isPresent()){
+				clubService.modificarClub(c);
+				return new ResponseEntity<String>("Se modifico el club", HttpStatus.OK);
+			}
+			else {
+				return new ResponseEntity<String>("No se encontro a ningun club con el id: "+c.getId(), HttpStatus.CONFLICT);
+			}
+		}
+	}
+	/*
 	@PutMapping("/club")
 	public ResponseEntity<?> modificarClub(@RequestBody @Valid ClubDTO c) {
 		//Para hacer un update previamente verifico que realmente quiera modificar ya que usa el save
@@ -111,13 +134,52 @@ public class ClubController {
 				return new ResponseEntity<String>("No se encontro a ningun club con el id: "+c.getId(), HttpStatus.CONFLICT);
 			}
 		}
-	}
+	}*/
+	
 	//----------------------------------------- DELETE ------------------------------------------
 	//Lo ejecuto con el postman
 	@DeleteMapping("/club")
 	public ResponseEntity<?> eliminarClub(@RequestBody @Valid Club c) {
-		System.out.println(c.toString());
-		clubRepository.delete(c);
-		return new ResponseEntity<String>("Se elimino el club "+c.getNombre(), HttpStatus.OK);
+		if(c.getId()==null)
+		{
+			return new ResponseEntity<String>("Para eliminar un club debe pasar un id", HttpStatus.CONFLICT);
+		}
+		else
+		{
+			Optional<Club> cOpt = this.clubRepository.findById(c.getId());
+			if(cOpt.isPresent()){
+				clubRepository.delete(c);
+				return new ResponseEntity<String>("Se elimino el club "+c.getNombre(), HttpStatus.OK);
+			}
+			else {
+				return new ResponseEntity<String>("No se encontro a ningun club con el id: "+c.getId(), HttpStatus.CONFLICT);
+			}
+		}
 	}
+	
+	//-----------------------------------------QUERYS PERSONALIZADAS------------------------------------------
+	@GetMapping("/clubesPorPais/{pais}")
+	//@PathVariable es para configurar que el parametro lo va a sacar de la ruta
+	public ResponseEntity<?> obtenerClubes(@PathVariable String pais) {
+		List<Club> entitys= clubRepository.findAllByPais(pais);
+		 return !entitys.isEmpty()? new ResponseEntity<List<ClubDTO>>(clubMapper.lstEntityToLstDto(entitys), HttpStatus.OK)
+				 : new ResponseEntity<String>("No se encontro ninguna club del pais: "+pais, HttpStatus.CONFLICT);
+		
+	}
+	@GetMapping("/clubes/{ligue}/{posicion}")
+	//@PathVariable es para configurar que el parametro lo va a sacar de la ruta
+	public ResponseEntity<?> obtenerClubesDeUnaLigaPorPosicion(@PathVariable String ligue, @PathVariable String posicion) {
+		List<Club> entitys= clubRepository.buscarClubesDeUnaLigaPorPosicion(ligue, posicion);
+		 return !entitys.isEmpty()? new ResponseEntity<List<ClubDTO>>(clubMapper.lstEntityToLstDto(entitys), HttpStatus.OK)
+				 : new ResponseEntity<String>("No se encontro ningun club de la liga '"+ligue+"' que tenga "+posicion, HttpStatus.CONFLICT);
+		
+	}
+	@GetMapping("/clubesConFc")
+	public ResponseEntity<?> obtenerClubesQueEnSuNombreContenganFC() {
+		List<Club> entitys= clubRepository.buscarClubesQueEnSuNombreContenganFC();
+		 return !entitys.isEmpty()? new ResponseEntity<List<ClubDTO>>(clubMapper.lstEntityToLstDto(entitys), HttpStatus.OK)
+				 : new ResponseEntity<String>("No se encontro ningun club que tenga 'FC' en su nombre", HttpStatus.CONFLICT);
+		
+	}
+
 }

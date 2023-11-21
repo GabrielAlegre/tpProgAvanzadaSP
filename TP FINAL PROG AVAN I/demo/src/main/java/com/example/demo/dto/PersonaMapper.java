@@ -41,11 +41,6 @@ public class PersonaMapper {
 		dto.setDni(entity.getDni());
 		dto.setDomicilios(domicilioMapper.lstEntityToLstDto(entity.getDomicilios()));
 		
-		/*
-		for (Domicilio d : entity.getDomicilios()) {
-			dto.getDomicilios().add(domicilioMapper.entityToDto(d));
-		}*/
-		
 		return dto;
 	}
 	

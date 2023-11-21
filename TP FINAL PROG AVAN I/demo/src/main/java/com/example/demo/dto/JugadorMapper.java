@@ -25,6 +25,8 @@ public class JugadorMapper {
 		dto.setApellido(entity.getApellido());
 		dto.setPosicion(entity.getPosicion());
 		dto.setId(entity.getId());
+		//nueva
+		dto.setEquipoDondeJuega(entity.getClub().getNombre());
 		return dto;
 	}
 	
