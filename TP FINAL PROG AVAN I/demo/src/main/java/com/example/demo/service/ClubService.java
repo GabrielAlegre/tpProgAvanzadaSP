@@ -25,10 +25,10 @@ public class ClubService {
 
 	public void modificarClub(ClubDTO c) {
 		/*verifico si quieren modificar los jugadores que esten asociado al club: HAY DOS OPCIONES
-		 * 1: Solo quiera modificar los datos del club, nombre, la liga donde juega, etc
+		 * 1: Solo quiera modificar los datos del club, nombre, la liga donde juega, etc pero NO los jugadores
 		 * 2: Quiera modificar los jugadores pertenecientes al club y algun dato propio del club
 		*/
-		if(c.getJugadores()!=null)//opcion 1, que tambien quiera modificar los jugadores del club
+		if(c.getJugadores()!=null)//opcion 2, que tambien quiera modificar los jugadores del club
 		{
 		    List<Jugador> jugadoresAntiguos = this.jugadorRepository.findJugadoresByClubId(c.getId());
 			for (Jugador j : jugadoresAntiguos) {
@@ -40,7 +40,7 @@ public class ClubService {
 			}
 			this.clubRepository.save(clubModificadoConJugadoresNuevos);
 		}
-		else//opcion 2 solo quiera modificar algun dato del club (nombre, la liga donde juega, fundacion) dejando los mismos jugadores
+		else//opcion 1 solo quiera modificar algun dato del club (nombre, la liga donde juega, fundacion) dejando los mismos jugadores
 		{
 			System.out.println("entre");
 		    c.setJugadores(new ArrayList<JugadorDTO>());

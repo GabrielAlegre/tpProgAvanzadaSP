@@ -94,15 +94,23 @@ public class JugadorController {
 		else {
 			Optional<Jugador> cOpt = this.jugadorRepository.findById(j.getId());
 			if(cOpt.isPresent()){
-				Optional<Club> clbuOpt = clubRepository.findById(j.getClub().getId());
-				if(clbuOpt.isPresent())
+				if(j.getClub()!=null)
+				{
+					Optional<Club> clbuOpt = clubRepository.findById(j.getClub().getId());
+					if(clbuOpt.isPresent())
+					{
+						jugadorRepository.save(j);
+						return new ResponseEntity<String>("Se modifico el jugador", HttpStatus.OK);
+					}
+					else {
+						return new ResponseEntity<String>("No se pudo realizar la modificacion xq NO existe un club con el id: "+j.getClub().getId(), HttpStatus.CONFLICT);
+					}	
+				}
+				else
 				{
 					jugadorRepository.save(j);
-					return new ResponseEntity<String>("Se modifico el jugador", HttpStatus.OK);
+					return new ResponseEntity<String>("Se modifico el jugador, ahora esta libre, no tiene club", HttpStatus.CONFLICT);
 				}
-				else {
-					return new ResponseEntity<String>("No se pudo realizar la modificacion xq NO existe un club con el id: "+j.getClub().getId(), HttpStatus.CONFLICT);
-				}	
 			}
 			else {
 				return new ResponseEntity<String>("No se encontro a ningun jugador con el id: "+j.getId(), HttpStatus.CONFLICT);
